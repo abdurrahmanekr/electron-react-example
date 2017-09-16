@@ -1,0 +1,2 @@
+# React kullanarak yapılan projeyi electron ile paketleme
+Bu dosyada yapılan işlemlerin açıklamalarını [bu makalede](http://www.avarekodcu.com/konu/28/electron-react-webpack-ve-babel-kullanarak-hem-masaustu-hem-tarayici-uygulamasi-gelistirme) bulabilirsiniz.
