@@ -1,5 +1,8 @@
 const electron = require('electron')
 const app = electron.app
+const dialog = electron.dialog
+const autoUpdater = electron.autoUpdater
+
 // Tarayıcı penceresi için gerekli
 const BrowserWindow = electron.BrowserWindow
 
@@ -37,6 +40,40 @@ function createWindow () {
     // pencere bellekte yer kaplamaması için boşaltıyoruz.
     mainWindow = null
   })
+
+  autoUpdater.on('update-downloaded', (event, releaseNotes, releaseName) => {
+    const dialogOpts = {
+        type: 'info',
+        buttons: ["Sistem Ne'yi Yeniden Başlat", "Sonra"],
+        title: 'Sistem Ne için Yeni Güncelleme Mevcut!',
+        message: process.platform === 'win32' ? releaseNotes : releaseName,
+        detail: 'Yeni güncelleme indirildi. Güncellemeleri kurmak için yeniden başlatmanız gerekiyor.'
+    }
+
+    // kullanıcıya güncellemeyi kabul etmesi için bir pencere açıyoruz
+    dialog.showMessageBox(dialogOpts, (response) => {
+      if (response === 0) {
+        autoUpdater.quitAndInstall();
+      }
+    })
+  })
+
+  autoUpdater.on('error', message => {
+    console.error('Güncellemede hata oluştu!');
+    console.error(message);
+  })
+
+  // uygulamamızın güncellemeleri takip ettiği adresi belirliyoruz
+  const server = 'http://download.example.com'
+  const feed = `${server}/update/${process.platform}/${app.getVersion()}`
+
+  autoUpdater.setFeedURL(feed);
+  // Güncellemeleri kontrol ediyoruz
+  autoUpdater.checkForUpdates();
+  setInterval(function() {
+    // saatte bir güncellemeleri kontrol ediyor.
+    autoUpdater.checkForUpdates();
+  }, 1000 * 60 * 60);
 }
 
 // Electron'a ait herşeyin yüklenmesi bittiğinde çalışır
